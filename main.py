@@ -1,6 +1,6 @@
 # 1. Library imports
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 import joblib
 import pandas as pd
 import shap
@@ -14,12 +14,17 @@ app = FastAPI()
 model = joblib.load('model.pkl')
 data = joblib.load('sample_test_set.pickle')
 
-@app.post('/predict/')
-async def predict(request: Request):
-    json_ = request.json()
-    query = pd.DataFrame(json_)
-    prediction = model.predict(query.values)
-    return int(prediction)
+@app.get("/predict/{client_id}")
+async def predict(client_id : int):
+    list_ID = data.index.tolist()
+    predictions = model.predict(data).tolist()
+    result = []
+
+    for pred, ID in zip(predictions, list_ID):
+        if ID == client_id:
+            result.append(pred)
+
+    return result
 
 @app.get('/shap_values/{client_id}')
 async def shap_values(client_id : int):
