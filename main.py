@@ -13,16 +13,13 @@ app = FastAPI()
 # Chargement du modèle
 model = joblib.load('model.pkl')
 data = joblib.load('sample_test_set.pickle')
-list_ID = data.index.tolist()
 
-@app.get("/predict/{client_id}")
-async def predict(client_id : int):
-    predictions = model.predict(data).tolist()
-    result = []
-    for pred, ID in zip(predictions, list_ID):
-        if ID == client_id:
-            result.append(pred)
-    return int(result[0])
+@app.post('/predict/')
+async def predict():
+    json_ = request.json
+    query = pd.DataFrame(json_)
+    prediction = model.predict(query.values)
+    return int(prediction)
 
 @app.get('/shap_values/{client_id}')
 async def shap_values(client_id : int):
@@ -34,6 +31,5 @@ async def shap_values(client_id : int):
     return shap_client
 
 # 5. Run the API with uvicorn
-#    Will run on http://127.0.0.1:8000
 if __name__ == '__main__':
-    uvicorn.run(app, host='127.0.0.1', port=8000)
+    uvicorn.run(app, host='35.180.29.152', port=8000, reload=True)
