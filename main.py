@@ -48,7 +48,7 @@ async def shap_client(client_id : int):
     shap_values = explainer.shap_values(df_preprocess, check_additivity=False)
     shap_values_client = shap_values[index_ID][0]
     json_shap_client = json.dumps(shap_values_client.tolist())
-    return json_shap_client
+    return {'shap_client':json_shap_client}
 
 # 5. Run the API with uvicorn
 if __name__ == '__main__':
