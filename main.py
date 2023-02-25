@@ -26,14 +26,6 @@ async def predict(client_id : int):
             predict_proba.append(pred[1])
     return predict_proba[0]
 
-@app.get('/generic_shap')
-async def generic_shap():
-    df_preprocess = model.named_steps['preprocessor'].transform(data)
-    explainer = shap.TreeExplainer(classifier)
-    shap_values = explainer.shap_values(df_preprocess, check_additivity=False)
-    shap_values_list = [value.tolist() for value in shap_values]
-    json_shap = json.dumps(shap_values_list)
-    return {'shap_values':json_shap}
 
 @app.get('/shap_client/{client_id}')
 async def shap_client(client_id : int):
@@ -49,7 +41,3 @@ async def shap_client(client_id : int):
     shap_values_client = shap_values[index_ID][0]
     json_shap_client = json.dumps(shap_values_client.tolist())
     return json_shap_client
-
-# 5. Run the API with uvicorn
-if __name__ == '__main__':
-    uvicorn.run(app, host='35.180.29.152', port=8000, reload=True)
